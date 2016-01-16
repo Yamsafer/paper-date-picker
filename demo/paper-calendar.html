@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
   <title>paper-date-picker Demo</title>
- 
+
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
   <link rel="import" href="../paper-date-picker.html">
@@ -30,10 +30,11 @@
 </head>
 <body unresolved>
   <template is="dom-bind" id="scope">
-    <h3>{{dateFormat(date, 'LLL')}}</h3>
+    <!-- <h3>{{dateFormat(date)}}</h3> -->
+    <h3> FROM {{ dateFormat(dateRange.from) }} -- TO  {{ dateFormat(dateRange.to) }} </h3>
     <section>
       <div id="container">
-        <paper-calendar id="picker" date="{{date}}"></paper-calendar>
+        <paper-calendar id="picker" date-range="{{ dateRange }}"></paper-calendar>
       </div>
     </section>
   </template>
@@ -43,7 +44,7 @@
       if (!date) {
         return 'No date selected';
       }
-      return moment(date).format(format);
+      return moment(date).calendar();
     };
     scope.date = new Date(2017, 3, 13);
   </script>
