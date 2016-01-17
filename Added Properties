@@ -1,0 +1,13 @@
+Added Properties
+  isRange : Boolean, '_dateRangeChanged'
+  dateRange : { from, to}
+  _selectionTurn String
+
+Added Functions
+  _dateRangeChanged
+  _tapDayRange
+
+Added CSS
+  .day-item.in-btween .selection {
+      fill: aqua;
+  }
