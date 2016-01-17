@@ -245,7 +245,7 @@
             properties: {
                 isRange: {
                     type: Boolean,
-                    value: true
+                    value: false
                 },
                 dateRange: {
                     type: Object,
@@ -262,9 +262,10 @@
                  * From/To
                  * @type {Object}
                  */
-                _selectionTurn: {
+                selectionTurn: {
                     type: String,
-                    value: "from"
+                    value: "from",
+                    notify: true
                 },
                 /*
                  * The selected date
@@ -459,9 +460,10 @@
                 if (this.dateRange.to && this.dateRange.to.getTime() === date.getTime())
                     cssClass += ' selected';
 
-
-                if (moment(date).isBefore(moment(this.dateRange.to)) && moment(date).isAfter(moment(this.dateRange.from)))
-                    cssClass += ' in-btween';
+                if (this.dateRange.to && this.dateRange.from) {
+                    if (moment(date).isBefore(moment(this.dateRange.to)) && moment(date).isAfter(moment(this.dateRange.from)))
+                        cssClass += ' in-btween';
+                }
 
                 return cssClass;
             },
@@ -672,27 +674,36 @@
             },
             _dateRangeChanged: function(dateRange, oldValue) {
 
-                if (!this._isValidDate(dateRange.from) || !this._isValidDate(dateRange.to)) {
-                    console.warn('Invalid date: ' + dateRange);
-                    this.dateRange = dateRange = oldValue;
+                if (this.selectionTurn == "from") {
+                    if (!this._isValidDate(dateRange.from)) {
+                        console.warn('Invalid date: ' + dateRange);
+                        this.dateRange = dateRange = oldValue;
+                    }
+                    if (!this._isValidDate(dateRange.from)) {
+                        console.warn('Invalid date: ' + dateRange);
+                        this.dateRange = dateRange = oldValue;
+                    }
+                } else {
+                    if (!this._isValidDate(dateRange.to)) {
+                        console.warn('Invalid date: ' + dateRange);
+                        this.dateRange = dateRange = oldValue;
+                    }
+                    if (!this._isValidDate(dateRange.to)) {
+                        console.warn('Invalid date: ' + dateRange);
+                        this.dateRange = dateRange = oldValue;
+                    }
                 }
-                if (!this._withinValidRange(dateRange.from) && !this._withinValidRange(dateRange.to)) {
-                    console.warn('Date outside of valid range: ' + dateRange.from + ' - ' + dateRange.to);
-                    this.dateRange = dateRange = oldValue;
-                }
-                // console.log(this._selectionTurn);
-                if(this._selectionTurn == "from"){
-                  if (oldValue && oldValue.from && oldValue.from.getTime && dateRange.from.getTime &&
-                      dateRange.from.getTime() === oldValue.from.getTime()) {
-                      console.log("dateRange.from == oldValue.from");
-                      return;
-                  };
-                }else{
-                  if (oldValue && oldValue.to && oldValue.to.getTime && dateRange.to.getTime &&
-                      dateRange.to.getTime() === oldValue.to.getTime()) {
-                      console.log("dateRange.to == oldValue.to");
-                      return;
-                  }
+
+                if (this.selectionTurn == "from") {
+                    if (oldValue && oldValue.from && oldValue.from.getTime && dateRange.from.getTime &&
+                        dateRange.from.getTime() === oldValue.from.getTime()) {
+                        return;
+                    };
+                } else {
+                    if (oldValue && oldValue.to && oldValue.to.getTime && dateRange.to.getTime &&
+                        dateRange.to.getTime() === oldValue.to.getTime()) {
+                        return;
+                    }
                 }
 
                 // clone the date object so as not to have unintended effects on bindings
@@ -720,18 +731,27 @@
                 this.date = event.model.item.date;
             },
             _tapDayRange: function(event) {
-                if (this._selectionTurn == "from") {
+                if (this.selectionTurn == "from") {
                     this.dateRange = {
-                      from  : event.model.item.date,
-                      to  : this.dateRange.to
+                        from: event.model.item.date,
+                        to: null
                     };
-                    this._selectionTurn = "to";
+                    this.selectionTurn = "to";
                 } else {
-                    this.dateRange = {
-                      from  : this.dateRange.from,
-                      to  : event.model.item.date
-                    };
-                    this._selectionTurn = "from";
+                    if (moment(event.model.item.date).isBefore(this.dateRange.from)) {
+                        this.selectionTurn = "from";
+                        this.dateRange = {
+                            from: event.model.item.date,
+                            to: null
+                        };
+                        this.selectionTurn = "to";
+                    }else{
+                        this.dateRange = {
+                            from: this.dateRange.from,
+                            to: event.model.item.date
+                        };
+                        this.selectionTurn = "from";
+                    }
                 }
             },
             _isValidDate: function(date) {
