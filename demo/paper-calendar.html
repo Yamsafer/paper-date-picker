@@ -36,7 +36,11 @@
         <!-- <h3> FROM {{ dateFormat(dateRange.from) }} -- TO  {{ dateFormat(dateRange.to) }} </h3> -->
         <section>
             <div id="container">
-                <paper-calendar id="picker" date-range="{{ dateRange }}" selection-turn="{{ selectionTurn }}"></paper-calendar>
+                <paper-calendar
+                is-range
+                id="picker"
+                date-range="{{ dateRange }}"
+                selection-turn="{{ selectionTurn }}"></paper-calendar>
             </div>
         </section>
     </template>
